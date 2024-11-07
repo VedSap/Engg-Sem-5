@@ -8,6 +8,7 @@ public class FIFO{
     private int pointer;
     private int[] pages;
     private int pageFaults;
+    public int pageHit;
 
     public FIFO(int frameCount, int[] pages) {
         this.frameCount = frameCount;
@@ -16,6 +17,7 @@ public class FIFO{
         Arrays.fill(frames, -1);
         this.pointer = 0;
         this.pageFaults = 0;
+        this.pageHit =0;
     }
 
     public void execute() {
@@ -36,7 +38,7 @@ public class FIFO{
         System.out.println("Total Page Faults: " + pageFaults);
     }
 
-    private boolean isPageInFrame(int page) {
+    public boolean isPageInFrame(int page) {
         for (int i = 0; i < frameCount; i++) {
             if (frames[i] == page) {
                 return true;

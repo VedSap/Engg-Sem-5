@@ -1,50 +1,65 @@
 package page_replacement;
-import java.util.*;
+import java.util.Scanner;
 
 public class LRU{
-
-    
-    static void lruPageReplacement(int[] pages, int capacity) {
-        LinkedHashSet<Integer> cache = new LinkedHashSet<>(capacity);
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the number of frames: ");
+        int frames = scanner.nextInt();
+        System.out.print("Enter the number of page references: ");
+        int pages = scanner.nextInt();
+        int[] pageReferences = new int[pages];
+        System.out.println("Enter the page reference sequence:");
+        for (int i = 0; i < pages; i++) {
+            pageReferences[i] = scanner.nextInt();
+        }
+        int[] pageFrame = new int[frames];
+        int[] recentUse = new int[frames];
         int pageFaults = 0;
-
-        for (int i = 0; i < pages.length; i++) {
-            int page = pages[i];
-
-            if (!cache.contains(page)) {
-                
-                if (cache.size() == capacity) {
-                    int firstPage = cache.iterator().next();
-                    cache.remove(firstPage);
+        for (int i = 0; i < frames; i++) {
+            pageFrame[i] = -1;
+            recentUse[i] = 0;
+        }
+        for (int i = 0; i < pages; i++) {
+            int page = pageReferences[i];
+            boolean pageHit = false;
+            for (int j = 0; j < frames; j++) {
+                if (pageFrame[j] == page) {
+                    pageHit = true;
+                    recentUse[j] = i;
+                    break;
                 }
-                
-                cache.add(page);
-                pageFaults++;
-            } else {
-                
-                cache.remove(page);
-                cache.add(page);
             }
 
-            
-            System.out.println(cache);
+            if (!pageHit) {
+                pageFaults++;
+
+                int lruIndex = 0;
+                for (int j = 1; j < frames; j++) {
+                    if (pageFrame[j] == -1) {
+                        lruIndex = j;
+                        break;
+                    }
+                    if (recentUse[j] < recentUse[lruIndex]) {
+                        lruIndex = j;
+                    }
+                }
+
+                pageFrame[lruIndex] = page;
+                recentUse[lruIndex] = i;  
+            }
+            System.out.print("Page " + page + ": ");
+            for (int j = 0; j < frames; j++) {
+                if (pageFrame[j] != -1) {
+                    System.out.print(pageFrame[j] + " ");
+                } else {
+                    System.out.print("- ");
+                }
+            }
+            System.out.println();
         }
 
-        System.out.println("Total Page Faults: " + pageFaults);
-    }
-
-    public static void main(String[] args) {
-    	Scanner sc = new Scanner(System.in);
-    	System.out.println("Enter number of Frames: ");
-        int frameCount = sc.nextInt();
-    	System.out.println("Enter number of pages");
-    	int N = sc.nextInt();
-        int[] pages = new int[N];
-        for(int i = 0; i < N; i++) {
-        	System.out.println("Enter the page"+ i);
-        	pages[i] = sc.nextInt();
-        }
-        lruPageReplacement(pages, frameCount);
-        sc.close();
+        System.out.println("Total page faults: " + pageFaults);
+        scanner.close();
     }
 }
